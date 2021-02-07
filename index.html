@@ -3,16 +3,27 @@
 <head>
 <meta charset="utf-8">
 <title>R2R</title>
+
+<style type="text/css">
+  input, button, html {
+    font-size: 16pt;
+  }
+  body {
+    margin: 25pt;
+  }
+</style>
+
 </head>
 
 <body>
+
 <form id="configForm">
   <input type="text" id="inputString" value="Hallo">
   <button type="submit">Go</button>
 </form>
 
 <div>
-  <svg id="svg" viewBox="0 0 50 10" xmlns="http://www.w3.org/2000/svg" width="1000"></svg>
+  <svg id="svg" viewBox="0 -1 60 10" xmlns="http://www.w3.org/2000/svg" width="100%"></svg>
 </div>
 
 <script>
@@ -56,41 +67,6 @@
   ];
   let alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".split('');
 
-  // let point = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-  // point.setAttribute("r", ".2");
-  // point.setAttribute("fill", "red");
-  // svg.appendChild(point);
-
-  // let start;
-
-  // function step(timestamp) {
-  //   if (start === undefined) {
-  //     start = timestamp;
-  //   }
-  //   let pos = ((timestamp - start) % 5000) / 5000 * q.getTotalLength();
-  //   let p = q.getPointAtLength(pos);
-  //   //p = p.matrixTransform(svg.getScreenCTM().inverse());
-  //   point.setAttribute("cx", p.x);
-  //   point.setAttribute("cy", p.y);
-  //   window.requestAnimationFrame(step);
-  // }
-  // window.requestAnimationFrame(step);
-
-
-
-// bar.onclick = () => {
-//   // let text = document.createElementNS("http://www.w3.org/2000/svg", 'text');
-//   // text.textContent = foo.value;
-//   // text.setAttribute("x", "10");
-//   // text.setAttribute("y", "50");
-//   // text.setAttribute("font-size", "16");
-//   // svg.appendChild(text);
-
-  
-
-//   console.log(a.getPointAtLength(.4));
-// }
-
   let getPoints = node => {
     let len = node.getTotalLength();
     let nodes = [];
@@ -103,11 +79,26 @@
 
   let randomElement = a => a[Math.floor(Math.random() * a.length)];
 
+  let createLine = (from, to) => {
+    let line = document.createElementNS("http://www.w3.org/2000/svg", 'line');
+    line.setAttribute("x1", from.x);
+    line.setAttribute("y1", from.y);
+    line.setAttribute("x2", to.x);
+    line.setAttribute("y2", to.y);
+    line.setAttribute("stroke", "red");
+    line.setAttribute("stroke-width", "0.4");
+    line.setAttribute("stroke-linecap", "round");
+    return line;
+  }
+
   let update = () => {
     svg.innerHTML = "";
 
     let text = inputString.value;
     let characters = text.toUpperCase().split('').filter(c => alphabet.includes(c));
+    
+    svg.setAttribute("viewBox", `0 -1 ${characters.length * 7 + 5} 10`)
+
     let x = 0;
     let contourNodes = [];
     characters.forEach((c) => {
@@ -123,25 +114,31 @@
       contourNode.setAttribute("fill", "none");
       svg.appendChild(contourNode);
       contourNodes.push(contourNode);
-      x += 8;
+      x += 7;
     });
 
     let points = contourNodes.map(getPoints);
     for (let i = 0; i < contourNodes.length - 1; i++) {
       let as = points[i];
       let bs = points[i+1];
-      let a = randomElement(as);
-      let b = randomElement(bs);
-      let line = document.createElementNS("http://www.w3.org/2000/svg", 'line');
-      line.setAttribute("x1", a.x);
-      line.setAttribute("y1", a.y);
-      line.setAttribute("x2", b.x);
-      line.setAttribute("y2", b.y);
-      line.setAttribute("stroke", "red");
-      line.setAttribute("stroke-width", "0.4");
-      line.setAttribute("stroke-linecap", "round")
-      svg.appendChild(line);
+      let aMaxX = Math.max(...as.map(p => p.x));
+      let bMinX = Math.min(...bs.map(p => p.x));
+      let a = randomElement(as.filter(p => Math.abs(p.x - aMaxX) < 0.3));
+      let b = randomElement(bs.filter(p => Math.abs(p.x - bMinX) < 0.3));
+      svg.appendChild(createLine(a, b));
     }
+
+    points.forEach(ps => {
+      let minY = Math.min(...ps.map(p => p.y));
+      let top = randomElement(ps.filter(p => Math.abs(p.y - minY) < 0.3));
+      let above = {x: top.x + Math.random() * 0.5 - 0.25, y: top.y - 1};
+      svg.appendChild(createLine(top, above));
+
+      let maxY = Math.max(...ps.map(p => p.y));
+      let bottom = randomElement(ps.filter(p => Math.abs(p.y - maxY) < 0.3));
+      let below = {x: bottom.x + Math.random() * 0.5 - 0.25, y: bottom.y + 1};
+      svg.appendChild(createLine(bottom, below));
+    });
   }
 
   update();
