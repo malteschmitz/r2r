@@ -69,13 +69,14 @@
     "m3.19 4.9q.264-.0854.504-.31.248-.225.411-.504.171-.287.202-.551-.217.155-.442.217-.225.0621-.52.0621-.396 0-.652-.132-.256-.14-.543-.396-.0466-.0466-.116-.202-.0699-.163-.124-.396-.0543-.241-.0543-.489 0-.225.14-.473.14-.248.349-.442.217-.202.411-.287.179-.0776.411-.132.241-.0621.404-.0621.551 0 .924.256.38.256.559.683.179.427.179.947 0 .893-.396 1.63-.396.73-1 1.13-.101.0698-.349.155-.241.0776-.442.0776-.155 0-.272-.14-.116-.14-.116-.318 0-.124.0854-.171.0854-.0543.279-.109zm.38-3.44q-.124 0-.295.0543-.163.0466-.279.116-.132.0776-.256.241-.116.155-.116.241 0 1.02.823 1.02.186 0 .411-.0776.233-.0854.388-.233.155-.147.155-.334 0-.512-.217-.768-.21-.256-.613-.256z"
   ];
   let alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".split('');
+  const NUM_POINTS = 100;
 
   let getPoints = node => {
     let len = node.getTotalLength();
     let nodes = [];
-    for (let i = 0; i < 50; i++) {
-      let point = node.getPointAtLength(len * i / 50);
-      nodes.push(point.matrixTransform(node.transform.baseVal.consolidate().matrix));
+    for (let i = 0; i < NUM_POINTS; i++) {
+      let point = node.getPointAtLength(len * i / NUM_POINTS);
+      nodes.push(point);
     }
     return nodes;
   }
@@ -94,6 +95,35 @@
     return line;
   }
 
+  let createCircle = (p) => {
+    let line = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
+    line.setAttribute("r", "0.3");
+    line.setAttribute("fill", "yellow");
+    line.setAttribute("cx", p.x);
+    line.setAttribute("cy", p.y);
+    return line;
+  }
+
+  function middlePoints(ps, p) {
+    ps.sort((a,b) => a.y - b.y);
+    let min = ps[0].y;
+    let max = ps[ps.length-1].y;
+    let mid = min + (max-min)/2;
+    let middles = ps.filter(p => Math.abs(p.y - mid) < 0.3);
+    middles.sort((a,b) => a.x - b.x);
+    return middles;
+  }
+
+  function moveX(point, offset) {
+    return {x: point.x + offset, y: point.y};
+  }
+
+  function distance(a, b) {
+    let dx = a.x - b.x;
+    let dy = a.y - b.y;
+    return Math.sqrt(dx*dx + dy*dy);
+  }
+
   let update = () => {
     svg.innerHTML = "";
 
@@ -102,46 +132,73 @@
     
     svg.setAttribute("viewBox", `0 -1 ${characters.length * 7 + 5} 10`)
 
-    let x = 0;
-    let contourNodes = [];
-    characters.forEach((c) => {
+    let paths = characters.map(c => {
       let characterNode = document.createElementNS("http://www.w3.org/2000/svg", 'path');
       let path = font[alphabet.indexOf(c)];
       characterNode.setAttribute("d", path);
-      characterNode.setAttribute("transform", `translate(${x}, 0)`);
       svg.appendChild(characterNode);
-      let contourPath = path.split('z')[0] + "z";
-      let contourNode = document.createElementNS("http://www.w3.org/2000/svg", 'path');
-      contourNode.setAttribute("d", contourPath);
-      contourNode.setAttribute("transform", `translate(${x}, 0)`);
-      contourNode.setAttribute("fill", "none");
-      svg.appendChild(contourNode);
-      contourNodes.push(contourNode);
-      x += 7;
+      return characterNode;
+    });
+    let contours = paths.map(p => {
+      let c = p.cloneNode();
+      let d = c.getAttribute("d");
+      c.setAttribute("d", d.split('z')[0] + "z");
+      return c;
     });
 
-    let points = contourNodes.map(getPoints);
-    for (let i = 0; i < contourNodes.length - 1; i++) {
-      let as = points[i];
-      let bs = points[i+1];
-      let aMaxX = Math.max(...as.map(p => p.x));
-      let bMinX = Math.min(...bs.map(p => p.x));
-      let a = randomElement(as.filter(p => Math.abs(p.x - aMaxX) < 0.3));
-      let b = randomElement(bs.filter(p => Math.abs(p.x - bMinX) < 0.3));
-      svg.appendChild(createLine(a, b));
+    let points = contours.map(getPoints);
+    let leftPoints = points.map(ps => randomElement(middlePoints(ps).slice(0,5)));
+    let rightPoints = points.map(ps => randomElement(middlePoints(ps).slice(-5)));
+
+    let mins = points.map(ps => Math.min(...ps.map(p => p.x)));
+    let maxs = points.map(ps => Math.max(...ps.map(p => p.x)));
+    let widths = mins.map((min, i) => maxs[i] - min);
+
+    let dx = 1;
+    let offsets = [dx-mins[0]];
+    for (let i = 0; i < points.length - 1; i++) {
+      dx += widths[i] + 1;
+      offsets[i+1] = dx - mins[i+1];
+    }
+    offsets.forEach((offset, i) => {
+      paths[i].setAttribute("transform", `translate(${offset}, 0)`);
+    });
+
+    for (let i = 0; i < points.length - 1; i++) {
+      let a = moveX(rightPoints[i], offsets[i]);
+      let b = moveX(leftPoints[i+1], offsets[i+1]);
+      if (distance(a,b) < 2.5) {
+        svg.append(createLine(a, b));
+      } else {
+        a = randomElement(points[i].filter(p => Math.abs(p.x - maxs[i]) < 0.3));
+        a = moveX(a, offsets[i]);
+        let bs = points[i+1].filter(p => Math.abs(p.y - a.y) < 0.3);
+        bs.sort((a,b) => a.x - b.x);
+        b = moveX(bs[0], offsets[i+1]);
+        svg.append(createLine(a, b));
+      }
     }
 
-    points.forEach(ps => {
+    points.slice(1,-1).forEach((ps, i) => {
+      i += 1;
       let minY = Math.min(...ps.map(p => p.y));
       let top = randomElement(ps.filter(p => Math.abs(p.y - minY) < 0.3));
       let above = {x: top.x + Math.random() * 0.5 - 0.25, y: top.y - 1};
-      svg.appendChild(createLine(top, above));
-
-      let maxY = Math.max(...ps.map(p => p.y));
-      let bottom = randomElement(ps.filter(p => Math.abs(p.y - maxY) < 0.3));
-      let below = {x: bottom.x + Math.random() * 0.5 - 0.25, y: bottom.y + 1};
-      svg.appendChild(createLine(bottom, below));
+      svg.appendChild(createLine(moveX(top, offsets[i]), moveX(above, offsets[i])));
     });
+
+    let ps = points[0];
+    let maxY = Math.max(...ps.map(p => p.y));
+    let bottom = randomElement(ps.filter(p => Math.abs(p.y - maxY) < 0.3));
+    let below = {x: bottom.x + Math.random() * 0.5 - 0.25, y: bottom.y + 1};
+    svg.appendChild(createLine(moveX(bottom, offsets[0]), moveX(below, offsets[0])));
+
+    let i = points.length - 1;
+    ps = points[i];
+    let maxX = maxs[i];
+    let right = randomElement(ps.filter(p => Math.abs(p.x - maxX) < 0.5));
+    let righter = {x: right.x + 1, y: right.y + Math.random() * 0.5 - 0.25};
+    svg.appendChild(createLine(moveX(right, offsets[i]), moveX(righter, offsets[i])));
   }
 
   update();
