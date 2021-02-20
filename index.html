@@ -30,7 +30,7 @@
 </div>
 
 <script>
-  let font = [
+  const font = [
     "m5.16 5.54q-.101-.132-.171-.287-.0698-.163-.147-.388-.0155-.0388-.0931-.233-.0698-.194-.163-.334-.489.0698-.799.0698-.171 0-.38-.00776-.202-.0155-.303-.0155-.388-.031-.621-.031-.0931.124-.163.264-.0621.14-.163.419-.14.404-.241.574-.0698.116-.272.116-.171 0-.318-.0698-.14-.0776-.14-.21.0621-.295.194-.621.14-.334.396-.885l.31-.761q.256-.652.466-1.12.217-.466.567-1.1.0466-.0931.155-.155.109-.0699.241-.0699.147 0 .21.0233.0698.0155.109.0621.0388.0388.116.171.264.411.45.846.194.435.489 1.2l.163.411q.217.559.373.939.163.373.357.683.124.202.124.279 0 .186-.116.287-.109.0931-.287.0931-.225 0-.341-.155zm-.799-1.88q-.124-.264-.357-.916-.241-.698-.481-1.11-.147.373-.435.962-.194.365-.442 1.06.497.0621 1.07.0621.411 0 .644-.0543z", 
     "m4.5 3.04q.567.0698.838.365.279.287.279.714t-.318.807q-.31.38-.799.59-.217.0854-.574.124-.349.0388-.722.0388-.621 0-1.27-.116-.116-.0233-.248-.116-.124-.0931-.124-.272-.0078-.714-.0543-1.99l-.0078-.427q-.031-.993-.031-1.56 0-.101.116-.233.124-.14.295-.155.101 0 .194-.00776.877-.0854 1.17-.0854.582 0 1.02.116.45.109.745.404.109.124.179.318.0698.186.0698.365.0078.38-.202.698-.202.318-.559.419zm-1.21-1.66q-.264 0-.551.031-.279.031-.473.0776l.0466 1.47.279-.00776q.675-.0698.993-.116.202-.0466.396-.179.194-.14.318-.287.132-.155.132-.233 0-.116-.0466-.233-.0466-.124-.101-.179-.21-.202-.427-.272-.217-.0698-.567-.0698zm-.955 3.62q.396.0543.753.0543.784 0 1.23-.202.458-.21.458-.792 0-.233-.349-.388-.349-.155-.753-.155-.272 0-.691.0621-.334.0466-.652.0621.0155.466.0155.59 0 .241-.0078.365z", 
     "m5.34 1.49q.116.14.163.225.0466.0854.0466.163 0 .0931-.124.217-.116.124-.233.124-.155 0-.248-.0466-.0931-.0466-.155-.147-.147-.233-.341-.411-.194-.186-.52-.186-.318 0-.714.147t-.582.365q-.419.512-.419 1.36 0 .675.419 1.16.442.497 1.12.497.31 0 .675-.109.373-.116.59-.373h-.0078q.14-.147.349-.147.124 0 .233.109.116.109.116.217 0 .116-.0388.21-.031.0854-.124.194-.318.349-.815.489-.489.132-1.12.132-.52 0-1-.248-.473-.248-.784-.629-.155-.225-.303-.644-.14-.427-.14-.691 0-.675.202-1.28.21-.613.621-.978.272-.248.784-.373.512-.124.939-.124.341 0 .582.101.248.0931.427.256.179.155.404.427z", 
@@ -68,10 +68,11 @@
     "m4.33 3.09q.473.186.761.497t.287.714q0 .116-.0543.295-.0466.171-.132.295-.512.792-1.81.792-.675 0-1.17-.272-.497-.279-.497-.83 0-.784 1.08-1.34-1.01-.373-1.01-1.1 0-.442.248-.745.248-.303.652-.45.411-.147.893-.147.357 0 .73.171.373.163.512.427.14.295.14.551 0 .334-.14.613-.132.279-.489.536zm-.807-.233q.248-.163.38-.264.14-.109.233-.256.101-.155.101-.357 0-.233-.186-.388-.186-.155-.45-.155-.567 0-.792.194-.217.194-.217.458 0 .21.14.357.14.14.31.225.178.0776.481.186zm1.03 1.39q0-.132-.171-.279-.163-.147-.388-.256-.225-.116-.38-.155-.264.109-.582.349-.318.233-.388.341-.0776.109-.109.186-.0233.0698-.0233.171 0 .116.14.225.14.101.334.163.194.0621.334.0621.551 0 .893-.217.341-.225.341-.59z", 
     "m3.19 4.9q.264-.0854.504-.31.248-.225.411-.504.171-.287.202-.551-.217.155-.442.217-.225.0621-.52.0621-.396 0-.652-.132-.256-.14-.543-.396-.0466-.0466-.116-.202-.0699-.163-.124-.396-.0543-.241-.0543-.489 0-.225.14-.473.14-.248.349-.442.217-.202.411-.287.179-.0776.411-.132.241-.0621.404-.0621.551 0 .924.256.38.256.559.683.179.427.179.947 0 .893-.396 1.63-.396.73-1 1.13-.101.0698-.349.155-.241.0776-.442.0776-.155 0-.272-.14-.116-.14-.116-.318 0-.124.0854-.171.0854-.0543.279-.109zm.38-3.44q-.124 0-.295.0543-.163.0466-.279.116-.132.0776-.256.241-.116.155-.116.241 0 1.02.823 1.02.186 0 .411-.0776.233-.0854.388-.233.155-.147.155-.334 0-.512-.217-.768-.21-.256-.613-.256z"
   ];
-  let alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".split('');
+  const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".split('');
   const NUM_POINTS = 100;
+  let character_distance = 1;
 
-  let getPoints = node => {
+  function getPoints(node) {
     let len = node.getTotalLength();
     let nodes = [];
     for (let i = 0; i < NUM_POINTS; i++) {
@@ -81,7 +82,9 @@
     return nodes;
   }
 
-  let randomElement = a => a[Math.floor(Math.random() * a.length)];
+  function randomElement(array) {
+    return array[Math.floor(Math.random() * array.length)];
+  }
 
   function randomRightElement(points, tolerance) {
     let max = Math.max(...points.map(p => p.x));
@@ -103,7 +106,7 @@
     return randomElement(points.filter(p => Math.abs(p.y - min) < tolerance));
   }
 
-  let createLine = (from, to) => {
+  function createLine(from, to) {
     let line = document.createElementNS("http://www.w3.org/2000/svg", 'line');
     line.setAttribute("x1", from.x);
     line.setAttribute("y1", from.y);
@@ -115,13 +118,19 @@
     return line;
   }
 
-  let createCircle = (p) => {
+  function createCircle(p) {
     let line = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
     line.setAttribute("r", "0.3");
     line.setAttribute("fill", "yellow");
     line.setAttribute("cx", p.x);
     line.setAttribute("cy", p.y);
     return line;
+  }
+
+  function createPath(d) {
+    let node = document.createElementNS("http://www.w3.org/2000/svg", 'path');
+    node.setAttribute("d", d);
+    return node;
   }
 
   function middlePoints(ps, p) {
@@ -143,20 +152,16 @@
     return Math.sqrt(dx*dx + dy*dy);
   }
 
-  let update = () => {
+  function update() {
     svg.innerHTML = "";
 
     let text = inputString.value;
     let characters = text.toUpperCase().split('').filter(c => alphabet.includes(c));
-    
-    svg.setAttribute("viewBox", `0 -1 ${characters.length * 7 + 5} 10`)
 
     let paths = characters.map(c => {
-      let characterNode = document.createElementNS("http://www.w3.org/2000/svg", 'path');
-      let path = font[alphabet.indexOf(c)];
-      characterNode.setAttribute("d", path);
-      svg.appendChild(characterNode);
-      return characterNode;
+      let node = createPath(font[alphabet.indexOf(c)]);
+      svg.appendChild(node);
+      return node;
     });
     let contours = paths.map(p => {
       let c = p.cloneNode();
@@ -172,18 +177,17 @@
     let leftPoints = points.map(ps => randomLeftElement(middlePoints(ps), 0.5));
     let rightPoints = points.map(ps => randomRightElement(middlePoints(ps), 0.5));
 
-    console.log(leftPoints);
-    console.log(rightPoints);
-
-    let dx = 1;
+    let dx = character_distance;
     let offsets = [dx-mins[0]];
     for (let i = 0; i < points.length - 1; i++) {
-      dx += widths[i] + 1;
+      dx += widths[i] + character_distance;
       offsets[i+1] = dx - mins[i+1];
     }
     offsets.forEach((offset, i) => {
       paths[i].setAttribute("transform", `translate(${offset}, 0)`);
     });
+    let width = widths.reduce((acc, w) => acc + w) + character_distance * (widths.length + 1);
+    svg.setAttribute("viewBox", `0 -1 ${width} 10`);
 
     for (let i = 0; i < points.length - 1; i++) {
       let a = moveX(rightPoints[i], offsets[i]);
