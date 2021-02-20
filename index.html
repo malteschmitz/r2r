@@ -83,6 +83,26 @@
 
   let randomElement = a => a[Math.floor(Math.random() * a.length)];
 
+  function randomRightElement(points, tolerance) {
+    let max = Math.max(...points.map(p => p.x));
+    return randomElement(points.filter(p => Math.abs(p.x - max) < tolerance));
+  }
+
+  function randomLeftElement(points, tolerance) {
+    let min = Math.min(...points.map(p => p.x));
+    return randomElement(points.filter(p => Math.abs(p.x - min) < tolerance));
+  }
+
+  function randomBottomElement(points, tolerance) {
+    let max = Math.max(...points.map(p => p.y));
+    return randomElement(points.filter(p => Math.abs(p.y - max) < tolerance));
+  }
+
+  function randomTopElement(points, tolerance) {
+    let min = Math.min(...points.map(p => p.y));
+    return randomElement(points.filter(p => Math.abs(p.y - min) < tolerance));
+  }
+
   let createLine = (from, to) => {
     let line = document.createElementNS("http://www.w3.org/2000/svg", 'line');
     line.setAttribute("x1", from.x);
@@ -109,8 +129,7 @@
     let min = ps[0].y;
     let max = ps[ps.length-1].y;
     let mid = min + (max-min)/2;
-    let middles = ps.filter(p => Math.abs(p.y - mid) < 0.3);
-    middles.sort((a,b) => a.x - b.x);
+    let middles = ps.filter(p => Math.abs(p.y - mid) < 0.5);
     return middles;
   }
 
@@ -147,12 +166,14 @@
     });
 
     let points = contours.map(getPoints);
-    let leftPoints = points.map(ps => randomElement(middlePoints(ps).slice(0,5)));
-    let rightPoints = points.map(ps => randomElement(middlePoints(ps).slice(-5)));
-
     let mins = points.map(ps => Math.min(...ps.map(p => p.x)));
     let maxs = points.map(ps => Math.max(...ps.map(p => p.x)));
     let widths = mins.map((min, i) => maxs[i] - min);
+    let leftPoints = points.map(ps => randomLeftElement(middlePoints(ps), 0.5));
+    let rightPoints = points.map(ps => randomRightElement(middlePoints(ps), 0.5));
+
+    console.log(leftPoints);
+    console.log(rightPoints);
 
     let dx = 1;
     let offsets = [dx-mins[0]];
@@ -167,36 +188,31 @@
     for (let i = 0; i < points.length - 1; i++) {
       let a = moveX(rightPoints[i], offsets[i]);
       let b = moveX(leftPoints[i+1], offsets[i+1]);
-      if (distance(a,b) < 2.5) {
+      if (distance(a,b) < 2) {
         svg.append(createLine(a, b));
       } else {
-        a = randomElement(points[i].filter(p => Math.abs(p.x - maxs[i]) < 0.3));
+        a = randomRightElement(points[i], 0.5);
         a = moveX(a, offsets[i]);
-        let bs = points[i+1].filter(p => Math.abs(p.y - a.y) < 0.3);
-        bs.sort((a,b) => a.x - b.x);
-        b = moveX(bs[0], offsets[i+1]);
+        let bs = points[i+1].filter(p => Math.abs(p.y - a.y) < 0.5);
+        b = moveX(randomLeftElement(bs, 0.5), offsets[i+1]);
         svg.append(createLine(a, b));
       }
     }
 
     points.slice(1,-1).forEach((ps, i) => {
       i += 1;
-      let minY = Math.min(...ps.map(p => p.y));
-      let top = randomElement(ps.filter(p => Math.abs(p.y - minY) < 0.3));
+      let top = randomTopElement(ps, 0.5);
       let above = {x: top.x + Math.random() * 0.5 - 0.25, y: top.y - 1};
       svg.appendChild(createLine(moveX(top, offsets[i]), moveX(above, offsets[i])));
     });
 
     let ps = points[0];
-    let maxY = Math.max(...ps.map(p => p.y));
-    let bottom = randomElement(ps.filter(p => Math.abs(p.y - maxY) < 0.3));
+    let bottom = randomBottomElement(ps, 0.5);
     let below = {x: bottom.x + Math.random() * 0.5 - 0.25, y: bottom.y + 1};
     svg.appendChild(createLine(moveX(bottom, offsets[0]), moveX(below, offsets[0])));
 
     let i = points.length - 1;
-    ps = points[i];
-    let maxX = maxs[i];
-    let right = randomElement(ps.filter(p => Math.abs(p.x - maxX) < 0.5));
+    let right = randomRightElement(points[i], 0.5);
     let righter = {x: right.x + 1, y: right.y + Math.random() * 0.5 - 0.25};
     svg.appendChild(createLine(moveX(right, offsets[i]), moveX(righter, offsets[i])));
   }
