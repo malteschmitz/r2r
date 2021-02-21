@@ -172,10 +172,6 @@
     return middles;
   }
 
-  function moveX(point, offset) {
-    return {x: point.x + offset, y: point.y};
-  }
-
   function distance(a, b) {
     let dx = a.x - b.x;
     let dy = a.y - b.y;
@@ -222,36 +218,33 @@
     });
     offsets.forEach((offset, i) => {
       paths[i].setAttribute("transform", `translate(${offset}, 0)`);
+      points[i].forEach(p => p.x += offset);
     });
     let width = dx + last(widths) + 2;
     svg.setAttribute("viewBox", `0 -1 ${width} 10`);
 
     points.slice(0, -1).forEach((leftPoints, i) => {
       const rightPoints = points[i + 1];
-      const leftOffset = offsets[i];
-      const rightOffset = offsets[i + 1];
-      let left = moveX(randomRightElement(middlePoints(leftPoints), 0.5), leftOffset);
-      let right = moveX(randomLeftElement(middlePoints(rightPoints), 0.5), rightOffset);
+      let left = randomRightElement(middlePoints(leftPoints), 0.5);
+      let right = randomLeftElement(middlePoints(rightPoints), 0.5);
       if (distance(left, right) < options.max_resistor_length) {
         background.append(createLine(left, right));
       } else {
         left = randomRightElement(leftPoints, 0.1);
-        left = moveX(left, leftOffset);
         right = randomLeftElement(rightPoints.filter(p => Math.abs(p.y - left.y) < 0.5), 0.1);
-        right = moveX(right, rightOffset);
         background.append(createLine(left, right));
       }
     });
 
     points.slice(1,-1).forEach((ps, i) => {
-      let top = moveX(randomTopElement(ps, options.top_tolerance), offsets[i + 1]);
+      let top = randomTopElement(ps, options.top_tolerance);
       background.appendChild(createIcon(top, topPath));
     });
 
-    let bottom = moveX(randomBottomElement(points[0], options.bottom_tolerance), offsets[0]);
+    let bottom = randomBottomElement(points[0], options.bottom_tolerance);
     background.appendChild(createIcon(bottom, groundPath));
 
-    let right = moveX(randomRightElement(last(points), options.right_tolerance), last(offsets));
+    let right = randomRightElement(last(points), options.right_tolerance);
     background.appendChild(createIcon(right, rightPath));
   }
 
