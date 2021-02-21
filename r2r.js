@@ -179,6 +179,10 @@ function kerning(a, b) {
 const svg = document.getElementById("svg");
 const inputString = document.getElementById("inputString");
 const configForm = document.getElementById("configForm");
+const downloadSvg = document.getElementById("downloadSvg");
+const downloadPng = document.getElementById("downloadPng");
+let currentName = "";
+let currentWidth = 0;
 
 function generate() {
   options.character_distance = value("character_distance");
@@ -193,6 +197,7 @@ function generate() {
 
   const text = inputString.value;
   const characters = text.toUpperCase().split("").filter(c => alphabet.includes(c));
+  currentName = characters.join("");
 
   const paths = characters.map((c, i) => {
     const node = createPath(font[alphabet.indexOf(c)]);
@@ -221,7 +226,8 @@ function generate() {
     points[i].forEach(p => p.x += offset);
   });
   const width = dx + last(widths) + 2;
-  svg.setAttribute("viewBox", `0 -1 ${width} 10`);
+  svg.setAttribute("viewBox", `0 -0.5 ${width} 8`);
+  currentWidth = width;
 
   points.slice(0, -1).forEach((leftPoints, i) => {
     const rightPoints = points[i + 1];
@@ -266,3 +272,48 @@ rangeIds.forEach(id => {
   const node = document.getElementById(id);
   node.onchange = () => generate();
 });
+
+function getSvgDataUrl() {
+  let data = svg.innerHTML;
+  const viewBox = svg.getAttribute("viewBox");
+  data = `<svg viewBox="${viewBox}" xmlns="http://www.w3.org/2000/svg">${data}</svg>`;
+  data = `data:image/svg+xml,${data}`;
+  return data;
+}
+
+function getPngDataUrl(callback) {
+  const canvas = document.createElement("canvas");
+  canvas.width = 1920;
+  canvas.height = 1920 * 8 / currentWidth;
+  const ctx = canvas.getContext("2d");
+  const img = new Image();
+  img.onload = () => {
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    const png = canvas.toDataURL("image/png");  
+    callback(png);
+  };
+  img.src = getSvgDataUrl();
+}
+
+function downloadUrl(url, filename, done) {
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => {
+    document.body.removeChild(a);
+    if (done) {
+      done();
+    }
+  });
+}
+
+downloadSvg.onclick = () => {
+  const url = getSvgDataUrl();
+  downloadUrl(url, `${currentName || "r2r"}.svg`);
+};
+
+downloadPng.onclick = () => {
+  getPngDataUrl(url => downloadUrl(url, `${currentName || "r2r"}.png`, () => URL.revokeObjectURL(url)));
+};
