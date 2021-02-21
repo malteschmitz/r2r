@@ -6,8 +6,8 @@ const colors = {
 
 const options = {
   num_points: 100,
-  character_distance: 1,
-  max_resistor_length: 2,
+  character_distance: 0.8,
+  max_resistor_length: 3,
   top_tolerance: 0.1,
   bottom_tolerance: 0.1,
   right_tolerance: 0.1,
