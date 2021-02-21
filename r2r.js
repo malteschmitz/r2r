@@ -15,7 +15,6 @@ const options = {
   vertical_tolerance: 0.5,
   resistor_tolerance: 0.5,
   resistor_small_tolerance: 0.1,
-  resistor_match_tolerance: 0.5,
   min_width_for_large_resistor: 1.5,
   icon_scale: 0.15
 };
@@ -65,6 +64,14 @@ const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".split("");
 const groundPath = "m.147-.826c-.219-.007-.389.12-.459.329-.185.503-.265 1.03-.265 1.56 0 .265.0266.529.106.794v.0264c-.714.0529-1.46.132-2.17.212-.238.0265-.45.185-.45.45 0 .238.211.502.45.45 1.24-.159 2.49-.185 3.76-.159.609.0265 1.22.053 1.83.106.318.0265.635.0795.953.106.318.0265.661.0795.952-.0264.238-.0529.423-.371.185-.582-.503-.397-1.3-.423-1.9-.476-.635-.0529-1.27-.106-1.93-.106h-.794c0-.0529-.0264-.106-.0264-.186-.0265-.159-.0527-.397-.0527-.608 0-.476.0525-.847.238-1.32.0794-.238-.106-.503-.317-.556-.0331-.007-.0654-.0104-.0966-.0114zm1.95 4.48c-.423 0-.82.0268-1.24.0532-.82.0265-1.61.0795-2.43.106-.688.0265-.688 1.08 0 1.06.82-.0265 1.61-.0795 2.43-.106.397-.0264.794-.0268 1.19-.0532.423-.0265.873-.0525 1.24-.238.238-.132.265-.556 0-.661-.37-.159-.794-.159-1.19-.159zm-1.37 1.92c-.265-.002-.538.0173-.796.0372-.132.0265-.265.0528-.371.159-.0794.0794-.159.238-.159.371s.0528.291.159.371c.106.0794.238.159.371.159.344-.0529.661-.0528 1.01-.0264.159 0 .318.0264.476.0264.212.0265.476.0796.661-.0527.212-.159.317-.397.185-.609-.132-.238-.423-.291-.661-.344-.212-.0529-.423-.0796-.608-.0796-.086-.007-.174-.01-.263-.0108z";
 const topPath = "m.956-3.48c-.265-.265-.635-.45-1.01-.423-.344 0-.661.159-.926.397-.582.556-.556 1.53-.0794 2.14.0265.0529.0794.0794.159.0794.132.212.317.37.529.476v.0529c0 .159-.0265.344-.0265.529-.0265.344-.0265.714-.0265 1.06 0 .265.238.503.503.503s.503-.212.503-.503c0-.344 0-.714-.0265-1.06 0-.185-.0265-.344-.0265-.529.423-.132.767-.476.926-.926.265-.609-.0265-1.35-.503-1.8zm-.344 1.56c-.0265.0265-.0265.0529-.0529.0794 0 0-.0265.0265-.0265.0529l-.0265.0265c-.0265.0265-.0529.0794-.106.106-.0529.0529-.0265.0265 0 0-.0265 0-.0265.0265-.0529.0265-.0265.0265-.0529.0265-.0794.0265h-.0265-.0265c-.0265 0-.0529 0-.0529.0265h-.0265-.0794c-.0265 0-.0529 0-.0794-.0265-.0265 0-.0794-.0265-.0794-.0265h-.0265l-.0529-.0529c-.0265-.0265-.0265-.0265-.0529-.0529 0-.0265-.0265-.0529-.0529-.0794 0 0 0-.0265-.0265-.0265v-.0529-.0265-.0265-.0265c.0529-.212-.0529-.476-.291-.529h-.0529c0-.0265 0-.0529.0265-.0529.0265-.0265.0265-.0529.0529-.0794.0265-.0265.0265-.0529.0529-.0794.0265-.0265.0794-.0794.106-.106.0265 0 .0265-.0265.0265-.0265.0265 0 .0529-.0265.0794-.0529h.0265c.0265 0 .0529-.0265.0794-.0265h.0265.132c.0265 0 .0529.0265.0794.0265h.0265c.0265 0 .0529.0265.0794.0529.0265.0265.0529.0529.106.0529 0 0 .0794.0794.106.0794.0265.0265.0794.0794.0529.0794.0265.0529.0529.0794.0794.132.0265.0265.0265.0529.0265.0794.0265.0529.0265.106.0529.132 0 .0265 0 .0529.0265.0794v.0265.132.0529c.0529.0265.0529.0529.0265.0794z";
 const rightPath = "m4.78-1.55c-.661.106-1.24.688-1.3 1.38-.582-.0265-1.14-.0265-1.72-.0265-.741 0-1.48 0-2.25.0265-.529 0-.529.847 0 .82.767-.0265 1.51-.0265 2.28-.0529.582-.0265 1.19-.0529 1.77-.106.106.238.238.45.45.635.265.212.609.37.952.344.318.212.767.238 1.14.0529.714-.397.741-1.38.45-2.04-.159-.344-.397-.661-.741-.847-.318-.212-.661-.265-1.03-.185zm.714.952s.0265 0 .0265.0265c-.0265-.0265.0265.0265.0529.0265l.0794.0794s.0265.0265.0265.0529c.0265.0529.0529.106.0794.132.0265.0265.0265.0529.0529.0794v.0265c.0265.0529.0265.106.0529.159 0 .0265.0265.0529.0265.106v.185.0265.0265.0265c0 .0529-.0265.132-.0529.159 0 0 0 .0265-.0265.0265-.0265.0265-.0265.0529-.0529.0794-.0265.0265-.0529.0529-.0794.0794-.0265 0-.0265 0-.0265.0265-.0265 0-.0265 0-.0529.0265h-.0529c-.0265 0-.0529-.0265-.0794-.0265s-.0265-.0265-.0529-.0265v-.0265c0-.238-.212-.45-.423-.423-.106 0-.212.0529-.291.106 0 0-.0265-.0265-.0265-.0265-.0265-.0529-.0529-.106-.0794-.159 0-.0265-.0265-.0529-.0265-.0794s0-.0529-.0265-.0794v-.132-.0265c0-.0265.0265-.0529.0265-.0794v-.0265s0-.0265.0265-.0265c.0265-.0265.0265-.0529.0529-.0794l.0265-.0265c.0265-.0265.0265-.0529.0529-.0529l.0529-.0529c.0265 0 .0529-.0265.0529-.0529.0265-.0265.0529-.0265.106-.0529.0265 0 .0265-.0265.0265-.0265.0529-.0265.106-.0265.159-.0529h.0529.0794.0265c.0529 0 .0794.0265.132.0265 0 .0265.0265.0529.0794.0529z";
+
+function value(id, val) {
+  const node = document.getElementById(id);
+  if (val) {
+    node.value = val;
+  }
+  return +node.value;
+} 
 
 function angle(a, b) {
   return Math.asin((b.y - a.y) / (b.x - a.x)) * 180 / Math.PI;
@@ -169,6 +176,12 @@ const inputString = document.getElementById("inputString");
 const configForm = document.getElementById("configForm");
 
 function generate() {
+  options.character_distance = value("character_distance");
+  options.max_resistor_length = value("max_resistor_length");
+  options.vertical_position = value("vertical_position");
+  options.vertical_tolerance = value("vertical_tolerance");
+  options.resistor_tolerance = value("resistor_tolerance");
+
   svg.innerHTML = "";
   const background = document.createElementNS("http://www.w3.org/2000/svg", "g");
   svg.appendChild(background);
@@ -208,12 +221,12 @@ function generate() {
   points.slice(0, -1).forEach((leftPoints, i) => {
     const rightPoints = points[i + 1];
     let left = randomRightElement(verticalRangePoints(leftPoints, options.vertical_position, options.vertical_tolerance), options.resistor_tolerance);
-    let right = randomLeftElement(rightPoints.filter(p => Math.abs(p.y - left.y) <= options.resistor_match_tolerance), options.resistor_tolerance);
+    let right = randomLeftElement(rightPoints.filter(p => Math.abs(p.y - left.y) <= options.resistor_tolerance), options.resistor_tolerance);
     if (distance(left, right) < options.max_resistor_length) {
       background.append(createResistor(left, right));
     } else {
       left = randomRightElement(leftPoints, options.resistor_small_tolerance);
-      right = randomLeftElement(rightPoints.filter(p => Math.abs(p.y - left.y) <= options.resistor_match_tolerance), options.resistor_small_tolerance);
+      right = randomLeftElement(rightPoints.filter(p => Math.abs(p.y - left.y) <= options.resistor_tolerance), options.resistor_tolerance);
       background.append(createResistor(left, right));
     }
   });
@@ -230,9 +243,21 @@ function generate() {
   background.appendChild(createIcon(right, rightPath));
 }
 
+value("character_distance", options.character_distance);
+value("max_resistor_length", options.max_resistor_length);
+value("vertical_position", options.vertical_position);
+value("vertical_tolerance", options.vertical_tolerance);
+value("resistor_tolerance", options.resistor_tolerance);
+
 generate();
 
 configForm.onsubmit = (event) => {
   event.preventDefault();
   generate();
 };
+
+const rangeIds = ["character_distance", "max_resistor_length", "vertical_position", "vertical_tolerance", "resistor_tolerance"];
+rangeIds.forEach(id => {
+  const node = document.getElementById(id);
+  node.onchange = () => generate();
+});

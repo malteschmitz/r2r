@@ -21,8 +21,33 @@
 <h1>Generator</h1>
 
 <form id="configForm">
-  <input type="text" id="inputString" value="R2R">
-  <button type="submit">Go</button>
+  <details>
+    <summary>Settings</summary>
+    <div>
+      <input type="range" id="character_distance" name="character_distance" min="0" max="3" step="0.1">
+      <label for="character_distance">character distance</label>
+    </div>
+    <div>
+      <input type="range" id="max_resistor_length" name="max_resistor_length" min="1" max="5" step="0.1">
+      <label for="max_resistor_length">max resistor length</label>
+    </div>
+    <div>
+      <input type="range" id="vertical_position" name="vertical_position" min="0" max="1" step="0.05">
+      <label for="vertical_position">vertical position</label>
+    </div>
+    <div>
+      <input type="range" id="vertical_tolerance" name="vertical_tolerance" min="0" max="5" step="0.1">
+      <label for="vertical_tolerance">vertical tolerance</label>
+    </div>
+    <div>
+      <input type="range" id="resistor_tolerance" name="resistor_tolerance" min="0.1" max="1" step="0.1">
+      <label for="resistor_tolerance">resistor tolerance</label>
+    </div>
+  </details>
+  <p>
+    <input type="text" id="inputString" value="R2R">
+    <button type="submit">Go</button>
+  </p>
 </form>
 
 <div>
