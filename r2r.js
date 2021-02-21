@@ -15,7 +15,9 @@ const options = {
   vertical_tolerance: 0.5,
   resistor_tolerance: 0.5,
   resistor_small_tolerance: 0.1,
-  resistor_match_tolerance: 0.5
+  resistor_match_tolerance: 0.5,
+  min_width_for_large_resistor: 1.5,
+  icon_scale: 0.15
 };
 
 // TODO further configurable options: position (instead of middle), position tolerance, ...
@@ -82,7 +84,7 @@ function createPath(d) {
 
 function createIcon(p, d) {
   const node = createPath(d);
-  node.setAttribute("transform", `translate(${p.x},${p.y}) scale(0.2)`);
+  node.setAttribute("transform", `translate(${p.x},${p.y}) scale(${options.icon_scale})`);
   node.setAttribute("fill", colors.pink);
   return node;
 }
@@ -95,7 +97,7 @@ function createResistor(a, b) {
   const alpha = angle(a, b);
   const width = distance(a,b);
   let node, scale;
-  if (width < 3.3) {
+  if (width <= options.min_width_for_large_resistor) {
     node = createPath(small);
     scale = width / smallWidth;
   } else {
