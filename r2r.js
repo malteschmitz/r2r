@@ -10,7 +10,12 @@ const options = {
   max_resistor_length: 2,
   top_tolerance: 0.1,
   bottom_tolerance: 0.1,
-  right_tolerance: 0.1
+  right_tolerance: 0.1,
+  vertical_position: 0.5,
+  vertical_tolerance: 0.5,
+  resistor_tolerance: 0.5,
+  resistor_small_tolerance: 0.1,
+  resistor_match_tolerance: 0.5
 };
 
 // TODO further configurable options: position (instead of middle), position tolerance, ...
@@ -200,13 +205,13 @@ function generate() {
 
   points.slice(0, -1).forEach((leftPoints, i) => {
     const rightPoints = points[i + 1];
-    let left = randomRightElement(verticalRangePoints(leftPoints, 0.5, 0.5), 0.5);
-    let right = randomLeftElement(verticalRangePoints(rightPoints, 0.5, 0.5), 0.5);
+    let left = randomRightElement(verticalRangePoints(leftPoints, options.vertical_position, options.vertical_tolerance), options.resistor_tolerance);
+    let right = randomLeftElement(rightPoints.filter(p => Math.abs(p.y - left.y) <= options.resistor_match_tolerance), options.resistor_tolerance);
     if (distance(left, right) < options.max_resistor_length) {
       background.append(createResistor(left, right));
     } else {
-      left = randomRightElement(leftPoints, 0.1);
-      right = randomLeftElement(rightPoints.filter(p => Math.abs(p.y - left.y) < 0.5), 0.1);
+      left = randomRightElement(leftPoints, options.resistor_small_tolerance);
+      right = randomLeftElement(rightPoints.filter(p => Math.abs(p.y - left.y) <= options.resistor_match_tolerance), options.resistor_small_tolerance);
       background.append(createResistor(left, right));
     }
   });
