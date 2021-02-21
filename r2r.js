@@ -74,7 +74,12 @@ function value(id, val) {
 } 
 
 function angle(a, b) {
-  return Math.asin((b.y - a.y) / (b.x - a.x)) * 180 / Math.PI;
+  const dx = b.x - a.x;
+  const dy = b.y - a.y;
+  if (dx === 0 || dy === 0) {
+    return 0;
+  }
+  return Math.atan(dy / dx) * 180 / Math.PI;
 }
 
 function distance(a, b) {
