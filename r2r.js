@@ -275,7 +275,7 @@ function getSvgDataUrl() {
   let data = svg.innerHTML;
   const viewBox = svg.getAttribute("viewBox");
   data = `<svg viewBox="${viewBox}" xmlns="http://www.w3.org/2000/svg">${data}</svg>`;
-  data = `data:image/svg+xml,${data}`;
+  data = `data:image/svg+xml,${encodeURIComponent(data)}`;
   return data;
 }
 
