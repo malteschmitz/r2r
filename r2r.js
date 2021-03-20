@@ -279,6 +279,18 @@ function getSvgDataUrl() {
   return data;
 }
 
+function getSvgDataUrlForPngExport() {
+  // this workaround is needed since otherwise PNG export silently fails in Firefox
+  // https://bugzilla.mozilla.org/show_bug.cgi?id=700533
+  svg.setAttribute('width', 1920);
+  svg.setAttribute('height', 1920 * 8 / currentWidth);
+  const xml = new XMLSerializer().serializeToString(svg);
+  svg.setAttribute('width', '100%');
+  svg.removeAttribute('height');
+  const svg64 = btoa(xml);
+  return `data:image/svg+xml;base64, ${svg64}`;
+}
+
 function getPngDataUrl(callback) {
   const canvas = document.createElement("canvas");
   canvas.width = 1920;
@@ -290,7 +302,7 @@ function getPngDataUrl(callback) {
     const png = canvas.toDataURL("image/png");  
     callback(png);
   };
-  img.src = getSvgDataUrl();
+  img.src = getSvgDataUrlForPngExport();
 }
 
 function downloadUrl(url, filename, done) {
