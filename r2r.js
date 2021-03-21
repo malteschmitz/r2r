@@ -271,24 +271,18 @@ rangeIds.forEach(id => {
   node.onchange = () => generate();
 });
 
-function getSvgDataUrl() {
+function getSvgDataUrl(includeDimensions) {
   let data = svg.innerHTML;
   const viewBox = svg.getAttribute("viewBox");
-  data = `<svg viewBox="${viewBox}" xmlns="http://www.w3.org/2000/svg">${data}</svg>`;
+  let dimensions = "";
+  if (includeDimensions) {
+    // explicit dimensions are needed since otherwise PNG export silently fails in Firefox
+    // https://bugzilla.mozilla.org/show_bug.cgi?id=700533
+    dimensions = ` width="1920" height="${1920 * 8 / currentWidth}"`;
+  }
+  data = `<svg viewBox="${viewBox}"${dimensions} xmlns="http://www.w3.org/2000/svg">${data}</svg>`;
   data = `data:image/svg+xml,${encodeURIComponent(data)}`;
   return data;
-}
-
-function getSvgDataUrlForPngExport() {
-  // this workaround is needed since otherwise PNG export silently fails in Firefox
-  // https://bugzilla.mozilla.org/show_bug.cgi?id=700533
-  svg.setAttribute('width', 1920);
-  svg.setAttribute('height', 1920 * 8 / currentWidth);
-  const xml = new XMLSerializer().serializeToString(svg);
-  svg.setAttribute('width', '100%');
-  svg.removeAttribute('height');
-  const svg64 = btoa(xml);
-  return `data:image/svg+xml;base64, ${svg64}`;
 }
 
 function getPngDataUrl(callback) {
@@ -302,7 +296,7 @@ function getPngDataUrl(callback) {
     const png = canvas.toDataURL("image/png");  
     callback(png);
   };
-  img.src = getSvgDataUrlForPngExport();
+  img.src = getSvgDataUrl(true);
 }
 
 function downloadUrl(url, filename, done) {
